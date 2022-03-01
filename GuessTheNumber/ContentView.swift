@@ -11,21 +11,24 @@ struct ContentView: View {
     @State private var currentValue = 3.0
     @State private var targetValue = Int.random(in: 1...100)
     
+    @State private var showAlert = false
+    
     var body: some View {
         VStack(spacing: 30){
-            Text("Подвинь слайдер, как можно ближе к: \(targetValue)")
-            HStack{
-                Text("0")
-                SliderView(currentValue: $currentValue, targetValue: $targetValue)
-                    .opacity(Double(computeScore())/100)
-                Text("100")
+            GameSlider(currentValue: $currentValue, targetValue: targetValue, color: .red, alpha: computeScore())
+            
+            Button("Проверь меня") {
+                showAlert.toggle()
             }
-            CheckButton(value: $currentValue, number: $targetValue)
+            .padding()
+            .alert("Это число: ", isPresented: $showAlert, actions: {}) {
+                Text("\(computeScore())")
+            }
+            
             Button("Начать заново") {
                 targetValue = Int.random(in: 1...100)
             }
         }
-        .padding()
     }
     
     private func computeScore() -> Int {

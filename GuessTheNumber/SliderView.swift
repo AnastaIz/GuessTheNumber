@@ -9,48 +9,52 @@ import SwiftUI
 
 struct SliderView: UIViewRepresentable {
     
-    @Binding var currentValue: Double
-    @Binding var targetValue: Int
+    @Binding var value: Double
+    
+    let color: UIColor
+    let alpha: Int
     
     func makeUIView(context: Context) -> UISlider {
-        let slider = UISlider(frame: .zero)
-        slider.minimumValue = 0.0
-        slider.maximumValue = 100.0
-        slider.thumbTintColor = .red
-        slider.value = Float(currentValue)
+        let slider = UISlider()
+        
+        slider.minimumValue = 1
+        slider.maximumValue = 100
+        
         slider.addTarget(
             context.coordinator,
-            action: #selector(Coordinator.valueChanged(_:)),
+            action: #selector(Coordinator.valueChanged),
             for: .valueChanged
         )
         
         return slider
     }
     
-    func updateUIView(_ uiView: UISlider, context: Context) {
+    func updateUIView(_ view: UISlider, context: Context) {
+        view.thumbTintColor = color.withAlphaComponent(CGFloat(alpha)/100)
+        view.value = Float(value)
     }
     
     func makeCoordinator() -> Coordinator {
-        Coordinator(self)
+        Coordinator(value: $value)
     }
 }
 
 extension SliderView {
     class Coordinator : NSObject {
-        var sliderView: SliderView
+        @Binding var value: Double
         
-        init(_ sliderView: SliderView) {
-            self.sliderView = sliderView
+        init(value: Binding<Double>) {
+            self._value = value
         }
         
         @objc func valueChanged(_ slider: UISlider) {
-            sliderView.currentValue = Double(slider.value)
+            value = Double(slider.value)
         }
     }
 }
 
 struct SliderView_Previews: PreviewProvider {
     static var previews: some View {
-        SliderView(currentValue: .constant(100), targetValue: .constant(100))
+        SliderView(value: .constant(100), color: .red, alpha: 100)
     }
 }
